@@ -16,3 +16,9 @@
         result
         (iter (next a) (combiner (term a) result))))
   (iter a null-value))
+
+(define (sum-iter term a next b)
+  (accumulate-iter + 0 term a next b))
+
+(define (prod-iter term a next b)
+  (accumulate-iter * 1 term a next b))
