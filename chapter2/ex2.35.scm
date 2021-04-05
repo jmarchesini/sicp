@@ -12,3 +12,7 @@
 
 (define (count-leaves t)
   (accumulate + 0 (map (lambda (x) 1) (enumerate-tree t))))
+
+
+;; 1 ]=> (count-leaves (list (list 1 2) (list 1 2 3) 1))
+;; ;Value: 6
