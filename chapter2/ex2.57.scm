@@ -53,12 +53,18 @@
 
 (define (addend x) (cadr x))
 
-(define (augend x) (caddr x))
+(define (augend x)
+  (if (null? (cdddr x))
+      (caddr x)
+      (cons '+ (cddr x))))
 
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
 
-(define (multiplicand x) (cadr x))
+(define (multiplicand x)
+  (if (null? (cdddr x))
+      (caddr x)
+      (cons '* (cddr x))))
 
 (define (multiplier x) (caddr x))
 
@@ -69,15 +75,5 @@
 
 (define (exponent e) (caddr e))
 
-
-;; 1 ]=> (deriv '(** x 2) 'x)
-;; ;Value: (* 2 x)
-
-;; 1 ]=> (deriv '(* a (** x 2)) 'x)
-;; ;Value: (* (* 2 x) a)
-
-;; 1 ]=> (deriv '(+ (* a (** x 2)) (* b x)) 'x)
-;; ;Value: (+ (* (* 2 x) a) b)
-
-;; 1 ]=> (deriv '(+ (+ (* a (** x 2)) (* b x)) c) 'x)
-;; ;Value: (+ (* (* 2 x) a) b)
+;; 1 ]=> (deriv '(* x y (+ x 3)) 'x)
+;; ;Value: (* y (+ (+ x 3) (+ x 3)))
