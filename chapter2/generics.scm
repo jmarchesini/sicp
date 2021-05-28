@@ -8,6 +8,7 @@
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
+(define (=zero? x) (apply-generic '=zero? x))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -27,6 +28,8 @@
        (lambda (x y) (tag (/ x y))))
   (put 'make 'scheme-number
        (lambda (x) (tag x)))
+  (put '=zero? '(scheme-number)
+       (lambda (x) (= 0 x)))
   'done)
 
 (define (make-scheme-number n)
@@ -70,9 +73,10 @@
        (lambda (x y) (tag (mul-rat x y))))
   (put 'div '(rational rational)
        (lambda (x y) (tag (div-rat x y))))
-  
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
+  (put '=zero? '(rational)
+       (lambda (x) (= 0 (car x))))
   'done)
 
 (define (make-rational n d)
@@ -137,6 +141,11 @@
   (put 'make-from-mag-ang 'complex
        (lambda (r a) 
          (tag (make-from-mag-ang r a))))
+  (put '=zero? '(complex)
+       (lambda (c1)
+         (and (= 0 (real-part c1))
+              (= 0 (imag-part c1)))))
+
   ;; added from ex2.77
   (put 'real-part '(complex) real-part)
   (put 'imag-part '(complex) imag-part)
@@ -219,7 +228,7 @@
 ;; Install packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(Install-polar-package)
+(install-polar-package)
 (install-rectangular-package)
 (install-complex-package)
 (install-rational-package)

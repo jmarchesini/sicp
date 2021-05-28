@@ -1,3 +1,6 @@
+(load "ex2.78.scm")
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Table definition
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -23,22 +26,10 @@
 ;; 1 ]=> (get 'add '(k1 k2))
 ;; Value: 42
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Table ops
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define (attach-tag type-tag contents)
-  (cons type-tag contents))
-
-(define (type-tag datum)
-  (if (pair? datum)
-    (car datum)
-    (error "bad tagged data -- TYPE-TAG" datum)))
-
-(define (content datum)
-  (if (pair? datum)
-    (cdr datum)
-    (error "bad tagged data -- CONTENTS" datum)))
 
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
