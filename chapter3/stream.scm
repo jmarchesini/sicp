@@ -12,6 +12,9 @@
 (define (display-stream s)
   (stream-for-each display-line s))
 
+(define (scale-stream s factor)
+  (stream-map (lambda (x) (* x factor)) s))
+
 (define (add-streams s1 s2)
   (stream-map + s1 s2))
 
