@@ -1,7 +1,9 @@
 ;; Interpreter given in Section 4.1
+(define apply-in-underlying-scheme apply)
+
 (define (eval exp env)
   (cond ((self-evaluating? exp) exp)
-        ((variable? exp) (lookup-variable-value env))
+        ((variable? exp) (lookup-variable-value exp env))
         ((quoted? exp) (text-of-quotation exp))
         ((assignment? exp) (eval-assignment exp env))
         ((definition? exp) (eval-definition exp env))
@@ -37,7 +39,7 @@
 (define (list-of-values exp env)
   (if (no-operands? exp)
       '()
-      (cons (eval (first-operand exps) env)
+      (cons (eval (first-operand exp) env)
             (list-of-values (rest-operands exp) env))))
 
 ;; Conditionals
@@ -65,7 +67,7 @@
 (define (eval-definition exp env)
   (define-variable!
     (definition-variable exp)
-    (eval (definition-variable exp) env)
+    (eval (definition-value exp) env)
     env)
   'ok)
 
@@ -319,3 +321,69 @@
              (scan (cdr vars) (cdr vals)))))
     (scan (frame-variables frame)
           (frame-values frame))))
+
+;; Primitives
+(define (primitive-procedure? proc)
+  (tagged-list? proc 'primitive))
+
+(define (primitive-implementation proc)
+  (cadr proc))
+
+(define primitive-procedures
+  (list (list 'car car)
+        (list 'cdr cdr)
+        (list 'cons cons)
+        (list 'null? null?)
+        (list '+ +)
+        (list 'map map)))
+
+(define (primitive-procedure-names)
+  (map car primitive-procedures))
+
+(define (primitive-procedure-objects)
+  (map (lambda (proc) (list 'primitive (cadr proc)))
+       primitive-procedures))
+
+(define (apply-primitive-procedure proc args)
+  (apply-in-underlying-scheme
+   (primitive-implementation proc) args))
+
+;; Driver
+(define (setup-environment)
+  (let ((initial-env
+         (extend-environment (primitive-procedure-names)
+                             (primitive-procedure-objects)
+                             the-empty-environment)))
+    (define-variable! 'true true initial-env)
+    (define-variable! 'false false initial-env)
+    initial-env))
+
+(define the-global-environment (setup-environment))
+
+(define input-prompt ";;; M-Eval input:")
+
+(define output-prompt ";;; M-Eval value:")
+
+(define (driver-loop)
+  (prompt-for-input input-prompt)
+  (let ((input (read)))
+    (let ((output (eval input the-global-environment)))
+      (announce-output output-prompt)
+      (user-print output)))
+  (driver-loop))
+
+(define (prompt-for-input string)
+  (newline) (newline) (display string) (newline))
+
+(define (announce-output string)
+  (newline) (display string) (newline))
+
+(define (user-print object)
+  (if (compound-procedure? object)
+      (display (list 'compound-procedure
+                     (procedure-parameters object)
+                     (procedure-body object)
+                     '<procedure-env>))
+      (display object)))
+
+(define the-global-environment (setup-environment))
