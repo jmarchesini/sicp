@@ -13,7 +13,7 @@
         ((if? exp) (analyze-if exp))
         ((lambda? exp) (analyze-lambda exp))
         ((begin? exp) (analyze-begin exp))
-        ((cond? exp) (analyze-cond exp))
+        ((cond? exp) (analyze (cond->if exp)))
         ((application? exp) (analyze-application exp))
         (else
          (error "Unknown expression type -- ANALYZE" exp))))
