@@ -364,11 +364,11 @@
   (apply-in-underlying-scheme
    (primitive-implementation proc) args))
 
-;; Thunks
-(define (force-it obj)
-  (if (thunk? obj)
-      (actual-value (thunk-exp obj) (thunk-env obj))
-      obj))
+;; Non-memoized thunks
+;; (define (force-it obj)
+;;   (if (thunk? obj)
+;;       (actual-value (thunk-exp obj) (thunk-env obj))
+;;       obj))
 
 (define (delay-it exp env)
   (list 'thunk exp env))
