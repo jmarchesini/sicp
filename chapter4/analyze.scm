@@ -42,7 +42,7 @@
       (define-variable! var (vproc env) env)
       'ok)))
 
-(define (analyze-if-exp exp)
+(define (analyze-if exp)
   (let ((pproc (analyze (if-predicate exp)))
         (cproc (analyze (if-consequent exp)))
         (aproc (analyze (if-alternative exp))))
