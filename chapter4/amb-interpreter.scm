@@ -18,7 +18,6 @@
         ((quoted? exp) (analyze-quoted exp))
         ((variable? exp) (analyze-variable exp))
         ((lambda? exp) (analyze-lambda exp))
-
         ((assignment? exp) (analyze-assignment exp))
         ((definition? exp) (analyze-definition exp))
         ((amb? exp) (analyze-amb exp))
