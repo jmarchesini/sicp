@@ -64,10 +64,10 @@
    frame-stream))
 
 (define (conjoin conjuncts frame-stream)
-  (if (empty-conjuntion? conjuncts)
+  (if (empty-conjunction? conjuncts)
       frame-stream
       (conjoin (rest-conjuncts conjuncts)
-               (qeval (first-conjunt conjuncts)
+               (qeval (first-conjunct conjuncts)
                       frame-stream))))
 
 (define (disjoin disjuncts frame-stream)
@@ -171,7 +171,7 @@
   (cond ((eq? frame 'failed) 'failed)
         ((equal? p1 p2) frame)
         ((var? p1) (extend-if-possible p1 p2 frame))
-        ((var? p2) (extent-if-possible p2 p1 frame))
+        ((var? p2) (extend-if-possible p2 p1 frame))
         ((and (pair? p1) (pair? p2))
          (unify-match (cdr p1)
                       (cdr p2)
