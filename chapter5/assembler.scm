@@ -132,3 +132,88 @@
 (define (goto-dest goto-instruction)
   (cadr goto-instruction))
 
+(define (make-save inst machine stack pc)
+  (let ((reg (get-register machine (stack-inst-reg-name inst))))
+    (lambda ()
+      (push stack (get-contents reg))
+      (advance-pc pc))))
+
+(define (make-restore inst machine stack pc)
+  (let ((reg (get-register machine (stack-inst-reg-name inst))))
+    (lambda ()
+      (set-contents! reg (pop stack))
+      (advance-pc pc))))
+
+(define (stack-inst-reg-name stack-instruction)
+  (cadr stack-instruction))
+
+(define (make-perform inst machine labels operations pc)
+  (let ((action (perform-action inst)))
+    (if (operation-exp? action)
+        (let ((action-proc
+               (make-operation-exp action machine labels operations)))
+          (lambda ()
+            (action-proc)
+            (advance-pc pc)))
+        (error "Bad PERFORM instruction: ASSEMBLE" inst))))
+
+(define (perform-inst inst)
+  (cdr inst))
+
+(define (make-primitive-exp exp machine labels)
+  (cond ((constant-exp? exp)
+         (let ((c (constant-exp-value exp)))
+           (lambda () c)))
+        ((label-exp? exp)
+         (let ((insts (lookup-label labels (label-exp-label exp))))
+           (lambda () insts)))
+        ((register-exp? exp)
+         (let ((r (get-register machine (register-exp-reg exp))))
+           (lambda () (get-contents t))))
+        (else
+         (error "Unknown expression type: ASSEMBLE" exp))))
+
+(define (register-exp? exp)
+  (tagged-list? exp 'reg))
+
+(define (register-exp-reg exp)
+  (cadr exp))
+
+(define (const-exp? exp)
+  (tagged-list? exp 'const))
+
+(define (constant-exp-value exp)
+  (cadr exp))
+
+(define (label-exp? exp)
+  (tagged-list? exp 'label))
+
+(define (label-exp-label exp)
+  (cadr exp))
+
+(define (make-operation-exp exp machine labels operations)
+  (let ((op (lookup-prim (operation-exp-op exp) operations))
+        (aprocs (map (lambda (e) (make-primitive-exp e machine labels))
+                     (operation-exp-operands exp))))
+    (lambda ()
+      (apply op (map (lambda (p) (p))
+                     aprocs)))))
+
+(define (operation-exp? exp)
+  (and (pair? exp)
+       (tagged-list? (car exp) 'op)))
+
+(define (operation-exp-op operation-exp)
+  (cadr (car operation-exp)))
+
+(define (operation-exp-operands operation-exp)
+  (cdr operation-exp))
+
+(define (lookup-prim symbol operations)
+  (let ((val (assoc symbol operations)))
+    (if val
+        (cadr val)
+        (error "Unknown symbol: ASSEMBLE" symbol))))
+
+
+    
