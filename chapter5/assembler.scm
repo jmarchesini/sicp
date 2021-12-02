@@ -1,3 +1,8 @@
+(define (tagged-list? exp tag)
+  (if (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
 (define (assemble controller-text machine)
   (extract-labels controller-text
                   (lambda (insts labels)
@@ -48,7 +53,7 @@
 (define (make-label-entry label-name insts)
   (cons label-name insts))
 
-(define (lookup-table labels label-name)
+(define (lookup-label labels label-name)
   (let ((val (assoc label-name labels)))
     (if val
         (cdr val)
@@ -76,7 +81,7 @@
   (let ((target (get-register machine (assign-reg-name inst)))
         (value-exp (assign-value-exp inst)))
     (let ((value-proc
-           (if (operation-exp? value-exp)
+           (if (operation-exp? value-exp)               
                (make-operation-exp value-exp machine labels operations)
                (make-primitive-exp (car value-exp) machine labels))))
       (lambda ()
@@ -92,7 +97,7 @@
 (define (advance-pc pc)
   (set-contents! pc (cdr (get-contents pc))))
 
-(define (make-test inst machine labels operations flags pc)
+(define (make-test inst machine labels operations flag pc)
   (let ((condition (test-condition inst)))
     (if (operation-exp? condition)
         (let ((condition-proc
@@ -107,7 +112,7 @@
 
 (define (make-branch inst machine labels flag pc)
   (let ((dest (branch-dest inst)))
-    (if (label-exp? inst)
+    (if (label-exp? dest)
         (let ((insts (lookup-label labels (label-exp-label dest))))
           (lambda ()
             (if (get-contents flag)
@@ -169,7 +174,7 @@
            (lambda () insts)))
         ((register-exp? exp)
          (let ((r (get-register machine (register-exp-reg exp))))
-           (lambda () (get-contents t))))
+           (lambda () (get-contents r))))
         (else
          (error "Unknown expression type: ASSEMBLE" exp))))
 
@@ -179,7 +184,7 @@
 (define (register-exp-reg exp)
   (cadr exp))
 
-(define (const-exp? exp)
+(define (constant-exp? exp)
   (tagged-list? exp 'const))
 
 (define (constant-exp-value exp)

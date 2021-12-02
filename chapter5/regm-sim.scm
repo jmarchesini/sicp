@@ -21,7 +21,7 @@
 (define (get-contents register)
   (register 'get))
 
-(define (set-contents register value)
+(define (set-contents! register value)
   ((register 'set) value))
 
 (define (make-stack)
