@@ -14,7 +14,7 @@ expt-loop
      (goto (label expt-loop))
 after-expt
      (restore continue)
-     (assign r (op *) reg r) (reg b))
+     (assign r (op *) (reg r) (reg b))
      (goto (reg continue))
 expt-base
      (assign r (const 1))
@@ -25,3 +25,4 @@ expt-done)))
 ;; (set-register-contents! expt-machine 'n 5)
 ;; (start expt-machine)
 ;; (get-register-contents expt-machine 'r)
+;; (print-stack-statistics expt-machine)
