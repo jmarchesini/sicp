@@ -11,7 +11,7 @@
      (assign a (reg b))
      (assign b (reg t))
      (goto (label test-b))
-     gcd-done)))
+gcd-done)))
 
 ;; (set-register-contents! gcd-machine 'a 206)
 ;; (set-register-contents! gcd-machine 'b 40)
