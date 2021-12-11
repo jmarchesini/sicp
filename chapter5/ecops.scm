@@ -267,6 +267,7 @@
         (list '- -)
         (list '/ /)
         (list '= =)
+        (list '> >)
         (list 'map map)))
 
 (define (primitive-procedure-names)
