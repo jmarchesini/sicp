@@ -5,7 +5,7 @@
         (cdr text)
         (lambda (insts labels)
           (let ((next-inst (car text)))
-            (if (sysmbol? next-inst)
+            (if (symbol? next-inst)
                 (let ((existing (assoc next-inst labels)))
                   (if existing
                       (error "Repeated label name" next-inst)

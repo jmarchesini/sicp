@@ -162,7 +162,7 @@
             (advance-pc pc)))
         (error "Bad PERFORM instruction: ASSEMBLE" inst))))
 
-(define (perform-inst inst)
+(define (perform-action inst)
   (cdr inst))
 
 (define (make-primitive-exp exp machine labels)

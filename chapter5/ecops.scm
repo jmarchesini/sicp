@@ -276,6 +276,8 @@
   (map (lambda (proc) (list 'primitive (cadr proc)))
        primitive-procedures))
 
+(define apply-in-underlying-scheme apply)
+
 (define (apply-primitive-procedure proc args)
   (apply-in-underlying-scheme
    (primitive-implementation proc) args))
@@ -289,3 +291,32 @@
     (define-variable! 'true true initial-env)
     (define-variable! 'false false initial-env)
     initial-env))
+
+(define (get-global-environment)
+  the-global-environment)
+
+(define (prompt-for-input string)
+  (newline) (newline) (display string) (newline))
+
+(define (announce-output string)
+  (newline) (display string) (newline))
+
+(define (user-print object)
+  (if (compound-procedure? object)
+      (display (list 'compound-procedure
+                     (procedure-parameters object)
+                     (procedure-body object)
+                     '<procedure-env>))
+      (display object)))
+
+;; Section 5.4 Footnotes
+(define (empty-arglist) '())
+
+(define (adjoin-arg arg arglist)
+  (append arglist (list arg)))
+
+(define (last-operand? ops)
+  (null? (cdr ops)))
+
+(define (no-more-exps? seq)
+  (null? seq))
