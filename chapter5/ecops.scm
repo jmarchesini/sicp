@@ -176,6 +176,18 @@
 (define (procedure-environment p)
   (cadddr p))
 
+(define (make-compiled-procedure entry env)
+  (list 'compiled-procedure entry env))
+
+(define (compiled-procedure? p)
+  (tagged-list? p 'compiled-procedure))
+
+(define (compiled-procedure-entry p)
+  (cadr p))
+
+(define (compiled-procedure-env p)
+  (caddr p))
+
 ;; Environment
 (define (enclosing-environment env)
   (cdr env))
