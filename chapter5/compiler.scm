@@ -1,4 +1,5 @@
 (load "ecops.scm")
+(load "formatter.scm")
 
 (define (compile exp target linkage)
   (cond ((self-evaluating? exp)
