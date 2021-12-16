@@ -19,5 +19,15 @@
 (define (my-length seq)
   (accumulate (lambda (x y) (+ 1 y)) 0 seq))
 
+;; Substitution:
+;;
+;; (define (accumulate op initial sequence)
+;;    (if (null? sequence)
+;;        initial
+;;        (lambda (x y) (+ 1 y) (car sequence) (accumulate op initial (cdr sequence)))
+;;
+;; ((+ 1 (accumulate op initial (cdr sequence)))))
+;; (+ 1 (+ 1 (+ 1 (+ 1 0))))
+
 ;; 1 ]=> (my-length (list 1 2 3 4))
 ;; ;Value: 4
