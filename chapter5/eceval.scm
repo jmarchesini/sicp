@@ -1,10 +1,12 @@
-(load "regm-sim.scm")
 (load "ecops.scm")
-
+(load "regm-sim.scm")
+(load "compiler.scm")
 
 (define eceval-operations
   (list
      (list 'read read)
+     (list 'list list)
+     (list 'cons cons)
      (list 'self-evaluating? self-evaluating?)
      (list 'quoted? quoted?)
      (list 'text-of-quotation text-of-quotation)
@@ -34,11 +36,16 @@
      (list 'first-operand first-operand)
      (list 'rest-operands rest-operands)
      (list 'true? true?)
+     (list 'false? false?)
      (list 'make-procedure make-procedure)
      (list 'compound-procedure? compound-procedure?)
      (list 'procedure-parameters procedure-parameters)
      (list 'procedure-body procedure-body)
      (list 'procedure-environment procedure-environment)
+     (list 'make-compiled-procedure make-compiled-procedure)
+     (list 'compiled-procedure? compiled-procedure?)
+     (list 'compiled-procedure-entry compiled-procedure-entry)
+     (list 'compiled-procedure-env compiled-procedure-env)
      (list 'extend-environment extend-environment)
      (list 'lookup-variable-value lookup-variable-value)
      (list 'set-variable-value! set-variable-value!)
@@ -61,6 +68,8 @@
    '(exp env val proc argl continue unev)
    eceval-operations
    '(
+     (branch (label external-entry)) ;; branch if flag is set
+
 read-eval-print-loop
      (perform (op initialize-stack))
      (perform (op prompt-for-input)
@@ -69,6 +78,12 @@ read-eval-print-loop
      (assign env (op get-global-environment))
      (assign continue (label print-result))
      (goto (label eval-dispatch))
+
+external-entry
+     (perform (op initialize-stack))
+     (assign env (op get-global-environment))
+     (assign continue (label print-result))
+     (goto (reg val))
 
 print-result
      (perform (op print-stack-statistics))
@@ -204,6 +219,8 @@ apply-dispatch
      (branch (label primitive-apply))
      (test (op compound-procedure?) (reg proc))
      (branch (label compound-apply))
+     (test (op compiled-procedure?) (reg proc))
+     (branch (label compiled-apply))
      (goto (label unknown-procedure-type))
 
 primitive-apply
@@ -229,6 +246,13 @@ compound-apply
              (op procedure-body)
              (reg proc))
      (goto (label ev-sequence))
+
+compiled-apply
+     (restore continue)
+     (assign val
+             (op compiled-procedure-entry)
+             (reg proc))
+     (goto (reg val))
 
 ev-begin
      (assign unev
@@ -326,4 +350,15 @@ ev-definition-1
 (define the-global-environment
   (setup-environment))
 
-(start eceval)
+(define (compile-and-go expression)
+  (let ((instructions 
+         (assemble (statements (compile expression 'val 'return)) eceval)))
+    (set! the-global-environment (setup-environment))
+    (set-register-contents! eceval 'val instructions)
+    (set-register-contents! eceval 'flag true)
+    (start eceval)))
+
+(define (start-eceval)
+  (set! the-global-environment (setup-environment))
+  (set-register-contents! eceval 'flag false)
+  (start eceval))

@@ -8,3 +8,4 @@ Useful sites:
 * https://billthelizard.blogspot.com/2009/10/sicp-challenge.html
 * https://codology.net/
 * http://community.schemewiki.org/?sicp-solutions
+* https://eli.thegreenplace.net/tag/sicp
